@@ -1,0 +1,54 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+version = '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.apache.hadoop:hadoop-common:3.4.0'
+    implementation 'org.apache.hadoop:hadoop-mapreduce-client-core:3.4.0'
+    implementation 'org.slf4j:slf4j-api:2.0.12'
+    implementation 'org.slf4j:slf4j-simple:2.0.13'
+    testImplementation 'org.assertj:assertj-core:3.26.3'
+    testImplementation 'junit:junit:4.13.2'
+}
+
+application {
+    mainClass = 'SalesAnalysator'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'SalesAnalysator'
+        )
+    }
+}
+
+task fatJar(type: Jar) {
+    archiveClassifier = 'all'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    with jar
+    exclude "META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA"
+
+    manifest {
+        attributes(
+                'Main-Class': 'SalesAnalysator'
+        )
+    }
+}
+
+build.dependsOn fatJar
